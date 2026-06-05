@@ -11,7 +11,7 @@ export const noticeInputSchema = z.object({
     .string({ required_error: "Title is required" })
     .trim()
     .min(1, "Title is required")
-    .max(200, "Title must be 200 characters or fewer"),
+    .max(150, "Title must be 150 characters or fewer"),
   body: z
     .string({ required_error: "Body is required" })
     .trim()
