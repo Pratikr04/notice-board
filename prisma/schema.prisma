@@ -1,0 +1,39 @@
+// Prisma schema for the Notice Board.
+// Docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// NOTE: `Urgent` is declared first on purpose. Prisma sorts enums by their
+// declared position, so `orderBy: { priority: "asc" }` puts every Urgent
+// notice above every Normal one directly in the database query.
+enum Priority {
+  Urgent
+  Normal
+}
+
+enum Category {
+  Exam
+  Event
+  General
+}
+
+model Notice {
+  id          String   @id @default(cuid())
+  title       String
+  body        String
+  category    Category @default(General)
+  priority    Priority @default(Normal)
+  publishDate DateTime
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([priority, publishDate])
+}
