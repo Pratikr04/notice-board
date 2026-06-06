@@ -1,87 +1,80 @@
-# Notice Board
+# Campus Notice Board
 
-A small notice board web app with full **create, read, update, and delete**. Notices are shown as responsive cards, **Urgent** notices are pinned to the top with a red badge (ordering is done in the database query), and every write goes through a validated API route.
+A notice board web app with full create, read, update, and delete. Notices show up as cards, urgent ones are pinned to the top with a red badge, and every change goes through a validated API route backed by a hosted Postgres database. Built with Next.js (Pages Router), Prisma, Neon Postgres, and Tailwind.
 
-**Live demo:** _add your Vercel URL here after deploying_
+**Live demo:** _add your Vercel URL here_
 
-## Tech stack
+## Stack
 
-| Layer          | Choice                                                        |
-| -------------- | ------------------------------------------------------------- |
-| Framework      | Next.js 14 — **Pages Router** (`pages/` directory)            |
-| Database access| Prisma ORM                                                    |
-| Database       | Prisma Postgres (free, hosted; any Postgres URL also works)   |
-| Hosting        | Vercel (Hobby / free tier)                                    |
-| Styling        | Tailwind CSS                                                  |
-| Validation     | Zod, run **server-side** inside the API routes                |
-| Language       | TypeScript                                                    |
+- Next.js 14 — Pages Router (the `pages/` directory)
+- Prisma ORM
+- PostgreSQL, hosted on Neon (free tier)
+- Tailwind CSS
+- Zod for server-side validation
+- TypeScript
 
-## Features
+## What it does
 
-- **Notices list** (`/`) — responsive card grid (1 / 2 / 3 columns), Edit + Delete on each card.
-- **Add / Edit** (`/notices/new`, `/notices/[id]/edit`) — one shared form; edit mode pre-loads current values.
-- **Delete** asks for confirmation in a modal first.
-- **Server-side validation** — required fields and a valid date are enforced inside the API route, returning `400` with per-field errors. The browser cannot bypass it.
-- **Urgent-first ordering in the DB** — `orderBy: [{ priority: "asc" }, { publishDate: "desc" }]`. The `Priority` enum declares `Urgent` before `Normal`, so ascending order puts all Urgent notices on top. Normal notices then sort by newest publish date.
-- **Optional image** (bonus) — paste an image URL; it renders as a card banner.
+- A list page (`/`) that shows every notice as responsive cards — one column on phones, two or three on larger screens. Each card has Edit and Delete buttons.
+- One form used for both creating and editing. In edit mode it loads with the notice's current values.
+- Delete asks for confirmation in a modal before anything is removed.
+- Validation runs on the server, inside the API route, so empty fields or an invalid date are rejected even if the browser checks are skipped. The route responds with `400` and a per-field message.
+- Urgent notices always appear above normal ones. That ordering happens in the database query, not in the browser: the `Priority` enum lists `Urgent` before `Normal`, so ordering by priority ascending puts every urgent notice on top. Within each group, the newest publish date comes first.
+- Optional image per notice (the bonus) — upload a file or paste an image URL, shown as a banner on the card.
+- A category filter and a search box on the list page.
 
-## Fields
+## Notice fields
 
-| Field         | Notes                                       |
-| ------------- | ------------------------------------------- |
-| `title`       | Short text. Required.                        |
-| `body`        | Longer text. Required.                       |
-| `category`    | `Exam` \| `Event` \| `General` (dropdown).   |
-| `priority`    | `Normal` \| `Urgent`.                         |
-| `publishDate` | A valid date.                                |
-| `imageUrl`    | Optional image URL (bonus).                  |
+| Field         | Notes                                     |
+| ------------- | ----------------------------------------- |
+| `title`       | Short text. Required.                     |
+| `body`        | Longer text. Required.                    |
+| `category`    | `Exam`, `Event`, or `General` (dropdown). |
+| `priority`    | `Normal` or `Urgent`.                     |
+| `publishDate` | A valid date.                             |
+| `imageUrl`    | Optional image (file upload or URL).      |
 
 ## API routes
 
-| Method   | Route                | Purpose                  | Success status |
-| -------- | -------------------- | ------------------------ | -------------- |
-| `GET`    | `/api/notices`       | List notices (ordered)   | `200`          |
-| `POST`   | `/api/notices`       | Create a notice          | `201`          |
-| `GET`    | `/api/notices/[id]`  | Read one notice          | `200`          |
-| `PUT`    | `/api/notices/[id]`  | Update a notice          | `200`          |
-| `DELETE` | `/api/notices/[id]`  | Delete a notice          | `204`          |
+| Method   | Route               | Purpose                | Success |
+| -------- | ------------------- | ---------------------- | ------- |
+| `GET`    | `/api/notices`      | List notices (ordered) | `200`   |
+| `POST`   | `/api/notices`      | Create a notice        | `201`   |
+| `GET`    | `/api/notices/[id]` | Read one notice        | `200`   |
+| `PUT`    | `/api/notices/[id]` | Update a notice        | `200`   |
+| `DELETE` | `/api/notices/[id]` | Delete a notice        | `204`   |
 
-Invalid input returns `400` with `{ message, errors }`; unknown ids return `404`; wrong methods return `405`.
+Invalid input returns `400` with `{ message, errors }`, unknown ids return `404`, and unsupported methods return `405`.
 
-## Run locally
+## Running it locally
 
-> Requires Node.js 18+.
+Requires Node.js 18 or newer.
 
-1. **Install dependencies**
+1. Install dependencies:
 
    ```bash
    npm install
    ```
 
-2. **Create a free Postgres database**
+2. Create a free Postgres database at <https://neon.tech> (no credit card needed) and copy the **pooled** connection string. Supabase or any other hosted Postgres works the same way.
 
-   - Go to <https://console.prisma.io>, create a **Postgres** database (free, no credit card), and copy the connection string.
-   - (Neon or Supabase also work — just paste their `postgresql://…` URL instead.)
-
-3. **Add environment variables**
-
-   Copy `.env.example` to `.env` and paste your connection string:
+3. Copy `.env.example` to `.env` and paste your connection string:
 
    ```bash
    cp .env.example .env
    ```
 
    ```env
-   DATABASE_URL="prisma+postgres://accelerate.prisma-data.net/?api_key=YOUR_API_KEY"
+   DATABASE_URL="postgresql://USER:PASSWORD@HOST-pooler.REGION.neon.tech/DB?sslmode=require"
    ```
 
-4. **Create the database tables**
+4. Create the database tables:
 
    ```bash
    npx prisma db push
    ```
 
-5. **Start the dev server**
+5. Start the dev server:
 
    ```bash
    npm run dev
@@ -89,27 +82,31 @@ Invalid input returns `400` with `{ message, errors }`; unknown ids return `404`
 
    Open <http://localhost:3000>.
 
-## Deploy to Vercel
+## Deploying to Vercel
 
-1. Push this repo to a **public** GitHub repository.
-2. On <https://vercel.com>, **Import** the repo (Hobby / free plan).
-3. Add an environment variable `DATABASE_URL` with the same value as your local `.env`.
+1. Push this repo to a public GitHub repository.
+2. Import it on <https://vercel.com> (free Hobby plan).
+3. Add an environment variable `DATABASE_URL` with the same Neon connection string.
 4. Deploy. The build runs `prisma generate && next build` automatically (see `package.json`).
-5. Run `npx prisma db push` once against the production database if you haven't already (it shares the same `DATABASE_URL`).
 
-The app uses server-side rendering and a hosted database, so notices persist across refreshes and redeploys.
+Because reads happen on the server and the database is hosted, notices persist across refreshes and redeploys.
 
-## One thing I would improve with more time
+## Future scope
 
-Add **authentication and roles** so only staff can create, edit, or delete notices while everyone else gets a read-only board, plus pagination/search and real file uploads (e.g. Vercel Blob / UploadThing) instead of pasting an image URL. I'd also add automated tests (Vitest + Playwright) around the API validation and the Urgent-ordering rule.
+Things I would add with more time:
 
-## Where and how AI was used
+- Authentication and roles, so only staff can create, edit, or delete notices while everyone else sees a read-only board.
+- Pagination once the list grows, with search handled on the server instead of in the browser.
+- Real file uploads to object storage (Vercel Blob, S3, or UploadThing) instead of storing image data inline.
+- An optional expiry or "pin until" date so outdated notices drop off the board automatically.
+- Email or push notifications when an urgent notice is posted.
+- Automated tests around the validation and the urgent-ordering rule (Vitest for the API, Playwright for the UI).
 
-AI (Claude) was used as a pair-programming assistant to:
+## How AI was used
 
-- Scaffold the Next.js Pages Router + Prisma + Tailwind project and config files.
-- Draft the Prisma schema, the CRUD API routes, and the Zod validation layer.
-- Generate the React components (list, card, shared form, confirm dialog) and styling.
-- Write this README.
+AI tools were permitted for this assignment, and I used Claude as a coding assistant. To be accurate about how:
 
-All generated code was reviewed, adjusted, and verified to build and run locally. The architectural decisions (enum ordering for the Urgent rule, server-side validation, SSR for reads) were made deliberately and checked against the assignment requirements.
+- I described the requirements and direction, and AI generated the initial codebase from that — the Prisma schema, the CRUD API routes, the Zod validation.
+- This README was written by AI based on my input.
+- I set up and configured the database. When the first deployment failed, I diagnosed the cause (the connection string pointed at a local-only database) and switched the database layer from Prisma Accelerate to a direct Neon Postgres connection myself.
+- I tested all four operations and the server-side validation by hand — including sending a request straight to the API to confirm validation runs on the server and not just in the browser — and went through the code to understand how each part fits together.
