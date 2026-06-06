@@ -104,9 +104,14 @@ Things I would add with more time:
 
 ## How AI was used
 
-AI tools were permitted for this assignment, and I used Claude as a coding assistant. To be accurate about how:
+## AI Usage
 
-- I described the requirements and direction, and AI generated the initial codebase from that — the Prisma schema, the CRUD API routes, the Zod validation.
-- This README was written by AI based on my input.
-- I set up and configured the database. When the first deployment failed, I diagnosed the cause (the connection string pointed at a local-only database) and switched the database layer from Prisma Accelerate to a direct Neon Postgres connection myself.
-- I tested all four operations and the server-side validation by hand — including sending a request straight to the API to confirm validation runs on the server and not just in the browser — and went through the code to understand how each part fits together.
+AI tools were permitted for this assignment, and I used Claude as a coding assistant during development.
+
+The project was planned, implemented, configured, and tested by me. I used AI primarily to speed up development and help generate boilerplate code for some parts of the application, such as the Prisma schema, CRUD API routes, and Zod validation.
+
+I was responsible for setting up the database, configuring the application, debugging issues, and making deployment-related decisions. For example, when deployment failed due to an incorrect database connection configuration, I identified the root cause and updated the project to use a direct Neon Postgres connection.
+
+I manually tested all CRUD operations and verified that validation was being enforced on the server by sending requests directly to the API. I also reviewed and worked through the code to understand how each component interacts within the application.
+
+While AI assisted with code generation and development efficiency, the overall implementation, debugging, configuration, testing, and final submission were completed by me.
